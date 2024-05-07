@@ -1,0 +1,46 @@
+﻿@page "/"
+@using EntityFrameworkInFrontend.DAL
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<BlazorSchoolContext> DbContextFactory
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+@if(AccountCounts == -1)
+{
+    <p>Click Count User</p>
+}
+else
+{
+    <p>Number of users: @AccountCounts</p>
+}
+
+<button @onclick="AddUser" type="button">Add User</button>
+<button @onclick="CountUser" type="button">Count User</button>
+
+@code {
+    public int AccountCounts { get; set; } = -1;
+
+    public void AddUser()
+    {
+        var random = new Random();
+        var context = DbContextFactory.CreateDbContext();
+
+        context.Accounts.Add(new()
+            {
+                Id = Guid.NewGuid(),
+                Username = $"Blazor School {random.Next(0, 9999999)}"
+            });
+
+        context.SaveChanges();
+    }
+
+    public void CountUser()
+    {
+        var context = DbContextFactory.CreateDbContext();
+        AccountCounts = context.Accounts.Count();
+    }
+}
